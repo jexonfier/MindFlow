@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>MindFlow — AI ассистент</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet"/>
+    <style>
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0B0F19;
+            color: #FFFFFF;
+            overflow-x: hidden;
+            line-height: 1.5;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 60px 0;
+        }
+
+        .hero-glow-1 {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(108, 99, 255, 0.15), transparent 70%);
+            top: -200px;
+            right: -200px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero-glow-2 {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(0, 212, 255, 0.08), transparent 70%);
+            bottom: -200px;
+            left: -200px;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .hero .container {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .hero-content {
+            flex: 1;
+        }
+
+        .badge {
+            background: rgba(108, 99, 255, 0.2);
+            border: 1px solid rgba(108, 99, 255, 0.3);
+            padding: 6px 20px;
+            border-radius: 50px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #6C63FF;
+            display: inline-block;
+            margin-bottom: 24px;
+            letter-spacing: 0.5px;
+        }
+
+        .hero h1 {
+            font-size: 64px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 20px;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-desc {
+            font-size: 20px;
+            color: #8892B0;
+            line-height: 1.7;
+            margin-bottom: 32px;
+            max-width: 540px;
+        }
+
+        .hero-input-wrapper {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 16px 24px;
+            font-size: 18px;
+            color: #8892B0;
+            margin-bottom: 28px;
+            display: flex;
+            align-items: center;
+            max-width: 500px;
+            backdrop-filter: blur(10px);
+            transition: border-color 0.3s;
+        }
+
+        .hero-input-wrapper:hover {
+            border-color: rgba(108, 99, 255, 0.3);
+        }
+
+        .typing-text {
+            color: #FFFFFF;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 2px;
+            height: 26px;
+            background: #6C63FF;
+            margin-left: 4px;
+            animation: blink 0.8s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            color: #FFFFFF;
+            font-size: 18px;
+            font-weight: 700;
+            padding: 16px 48px;
+            border-radius: 60px;
+            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 8px 32px rgba(108, 99, 255, 0.3);
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-2px) scale(1.02);
+            box-shadow: 0 12px 48px rgba(108, 99, 255, 0.5);
+        }
+
+        .cta-btn.outline {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: none;
+        }
+
+        .cta-btn.outline:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-2px);
+        }
+
+        .cta-sub {
+            margin-top: 16px;
+            font-size: 14px;
+            color: #475569;
+        }
+
+        .hero-image {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+        }
+
+        .chat-preview {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            padding: 30px;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-msg {
+            padding: 12px 18px;
+            border-radius: 16px;
+            margin-bottom: 12px;
+            max-width: 80%;
+            font-size: 15px;
+        }
+
+        .chat-msg.user {
+            background: rgba(108, 99, 255, 0.2);
+            border: 1px solid rgba(108, 99, 255, 0.2);
+            margin-left: auto;
+            text-align: right;
+        }
+
+        .chat-msg.ai {
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .chat-msg.ai .dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #6C63FF;
+            border-radius: 50%;
+            margin-right: 4px;
+            animation: pulse-dot 1.2s infinite;
+        }
+
+        .chat-msg.ai .dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .chat-msg.ai .dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes pulse-dot {
+            0%,
+            80%,
+            100% {
+                transform: scale(0.6);
+                opacity: 0.4;
+            }
+            40% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        /* ===== TRUST BAR ===== */
+        .trust {
+            padding: 40px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .trust p {
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .trust-logos {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 30px;
+        }
+
+        .trust-logos span {
+            color: #334155;
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            transition: color 0.3s;
+        }
+
+        .trust-logos span:hover {
+            color: #64748B;
+        }
+
+        /* ===== FEATURES ===== */
+        .features {
+            padding: 100px 0;
+        }
+
+        .section-label {
+            text-align: center;
+            color: #6C63FF;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 44px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .section-sub {
+            text-align: center;
+            color: #8892B0;
+            font-size: 18px;
+            max-width: 600px;
+            margin: 0 auto 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 40px 30px;
+            transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: rgba(108, 99, 255, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature-icon {
+            font-size: 40px;
+            margin-bottom: 16px;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            color: #8892B0;
+            line-height: 1.7;
+        }
+
+        /* ===== TERMINAL ===== */
+        .terminal-section {
+            padding: 100px 0;
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        .terminal-box {
+            background: #0A0D15;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 750px;
+            margin: 40px auto 0;
+            font-family: 'Courier New', monospace;
+            position: relative;
+            overflow: hidden;
+            min-height: 200px;
+        }
+
+        .terminal-box .line {
+            color: #00D4FF;
+            font-size: 15px;
+            padding: 4px 0;
+            opacity: 0;
+            transform: translateY(8px);
+            animation: terminalFade 0.5s forwards;
+        }
+
+        .terminal-box .line.green {
+            color: #4ADE80;
+        }
+        .terminal-box .line.gray {
+            color: #64748B;
+        }
+        .terminal-box .line.white {
+            color: #FFFFFF;
+        }
+
+        .terminal-box .line .highlight {
+            color: #6C63FF;
+        }
+
+        @keyframes terminalFade {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .terminal-box .line:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+        .terminal-box .line:nth-child(2) {
+            animation-delay: 0.8s;
+        }
+        .terminal-box .line:nth-child(3) {
+            animation-delay: 1.4s;
+        }
+        .terminal-box .line:nth-child(4) {
+            animation-delay: 2.0s;
+        }
+        .terminal-box .line:nth-child(5) {
+            animation-delay: 2.6s;
+        }
+        .terminal-box .line:nth-child(6) {
+            animation-delay: 3.2s;
+        }
+
+        .progress-bar {
+            display: inline-block;
+            width: 120px;
+            height: 6px;
+            background: #1E293B;
+            border-radius: 4px;
+            vertical-align: middle;
+            margin: 0 8px;
+            overflow: hidden;
+        }
+
+        .progress-bar .fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, #6C63FF, #00D4FF);
+            border-radius: 4px;
+            animation: progressFill 2s ease-in-out forwards;
+            animation-delay: 0.4s;
+        }
+
+        @keyframes progressFill {
+            to {
+                width: 78%;
+            }
+        }
+
+        /* ===== PRICING ===== */
+        .pricing {
+            padding: 100px 0;
+        }
+
+        .pricing-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .pricing-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-6px);
+        }
+
+        .pricing-card.popular {
+            border-color: #6C63FF;
+            background: rgba(108, 99, 255, 0.05);
+            position: relative;
+        }
+
+        .pricing-card.popular::before {
+            content: '🔥 Самый популярный';
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, #6C63FF, #00D4FF);
+            padding: 4px 20px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .pricing-card .price {
+            font-size: 48px;
+            font-weight: 900;
+            margin: 16px 0 8px;
+        }
+
+        .pricing-card .price span {
+            font-size: 18px;
+            font-weight: 400;
+            color: #8892B0;
+        }
+
+        .pricing-card .plan-name {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .pricing-card ul {
+            list-style: none;
+            margin: 24px 0 32px;
+        }
+
+        .pricing-card ul li {
+            padding: 8px 0;
+            color: #94A3B8;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .pricing-card ul li:last-child {
+            border-bottom: none;
+        }
+
+        .pricing-card .cta-btn {
+            font-size: 15px;
+            padding: 14px 40px;
+            box-shadow: none;
+        }
+
+        /* ===== FINAL CTA ===== */
+        .final-cta {
+            padding: 80px 0 120px;
+            text-align: center;
+        }
+
+        .final-cta h2 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .final-cta p {
+            color: #8892B0;
+            font-size: 18px;
+            margin-bottom: 32px;
+        }
+
+        .final-cta .cta-btn {
+            font-size: 20px;
+            padding: 18px 60px;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 32px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.04);
+            text-align: center;
+            color: #475569;
+            font-size: 14px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 1024px) {
+            .hero h1 {
+                font-size: 48px;
+            }
+            .features-grid,
+            .pricing-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero .container {
+                flex-direction: column;
+                gap: 40px;
+            }
+
+            .hero h1 {
+                font-size: 36px;
+            }
+
+            .hero-desc {
+                font-size: 17px;
+            }
+
+            .hero-input-wrapper {
+                max-width: 100%;
+                font-size: 16px;
+                padding: 14px 18px;
+            }
+
+            .chat-preview {
+                max-width: 100%;
+            }
+
+            .features-grid,
+            .pricing-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .section-title {
+                font-size: 32px;
+            }
+
+            .final-cta h2 {
+                font-size: 32px;
+            }
+
+            .trust-logos {
+                gap: 16px;
+            }
+            .trust-logos span {
+                font-size: 16px;
+            }
+
+            .pricing-card.popular::before {
+                font-size: 10px;
+                padding: 3px 14px;
+                top: -10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero h1 {
+                font-size: 28px;
+            }
+            .hero .container {
+                padding: 0 16px;
+            }
+            .hero-input-wrapper {
+                font-size: 14px;
+                padding: 12px 14px;
+            }
+            .cta-btn {
+                font-size: 16px;
+                padding: 14px 32px;
+            }
+            .terminal-box {
+                padding: 20px;
+                font-size: 13px;
+            }
+            .terminal-box .line {
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="hero-glow-1"></div>
+        <div class="hero-glow-2"></div>
+
+        <div class="container">
+            <div class="hero-content">
+                <span class="badge">🔥 Новая версия 2.0</span>
+                <h1>
+                    Освободи свой день<br />
+                    с <span class="gradient-text">MindFlow</span>
+                </h1>
+                <p class="hero-desc">
+                    Искусственный интеллект, который пишет тексты, генерирует идеи
+                    и закрывает рутину в 10 раз быстрее. Просто начни печатать.
+                </p>
+
+                <div class="hero-input-wrapper">
+                    <span class="typing-text"></span>
+                    <span class="cursor">|</span>
+                </div>
+
+                <!-- ===== КНОПКА 1: Telegram ===== -->
+                <a href="https://t.me/Jexonflier" target="_blank" class="cta-btn">🚀 Начать бесплатно</a>
+                <p class="cta-sub">Без карты. 14 дней пробного периода</p>
+            </div>
+
+            <div class="hero-image">
+                <div class="chat-preview">
+                    <div class="chat-msg user">Привет! Помоги написать пост для Instagram 🙌</div>
+                    <div class="chat-msg ai">
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                        <span class="dot"></span>
+                    </div>
+                    <div class="chat-msg ai" style="animation-delay: 1.2s; opacity: 0; animation: terminalFade 0.5s forwards 1.2s;">
+                        Конечно! О чём будет пост? 🔥
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TRUST BAR ===== -->
+    <section class="trust">
+        <div class="container">
+            <p>Присоединяются к нам</p>
+            <div class="trust-logos">
+                <span>Google</span>
+                <span>Microsoft</span>
+                <span>OpenAI</span>
+                <span>Slack</span>
+                <span>Figma</span>
+                <span>GitHub</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FEATURES ===== -->
+    <section class="features">
+        <div class="container">
+            <p class="section-label">Возможности</p>
+            <h2 class="section-title">Что умеет <span class="gradient-text">MindFlow</span></h2>
+            <p class="section-sub">Всё, что нужно для продуктивной работы и творчества</p>
+
+            <div class="features-grid">
+                <div class="feature-card">
+                    <span class="feature-icon">🧠</span>
+                    <h3>Мгновенный анализ</h3>
+                    <p>Обрабатывает до 100 страниц текста за 3 секунды. Находит ключевые инсайты и структурирует данные.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🎨</span>
+                    <h3>Креативный генератор</h3>
+                    <p>Создаёт посты, статьи, сценарии и даже код на 15+ языках. Твой личный контент-цех.</p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔗</span>
+                    <h3>Интеграции 24/7</h3>
+                    <p>Подключается к Telegram, Slack, Notion и Gmail. Работает там, где ты уже есть.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== TERMINAL ===== -->
+    <section class="terminal-section">
+        <div class="container">
+            <p class="section-label">Демонстрация</p>
+            <h2 class="section-title">Смотри, как это <span class="gradient-text">работает</span></h2>
+            <p class="section-sub">Живой терминал показывает процесс обработки твоего запроса</p>
+
+            <div class="terminal-box">
+                <div class="line gray">$ mindflow --run</div>
+                <div class="line">Загрузка модели... <span class="progress-bar"><span class="fill"></span></span> 78%</div>
+                <div class="line green">✅ Подключение к базе знаний...</div>
+                <div class="line">Обработка запроса: <span class="highlight">"Напиши пост для Instagram"</span></div>
+                <div class="line">Генерация... <span style="color:#6C63FF;">▌</span><span style="color:#6C63FF;">▌</span><span style="color:#6C63FF;">▌</span></div>
+                <div class="line white">📝 Готово! Сохранено в твои проекты.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== PRICING ===== -->
+    <section class="pricing">
+        <div class="container">
+            <p class="section-label">Тарифы</p>
+            <h2 class="section-title">Выбери свой <span class="gradient-text">план</span></h2>
+            <p class="section-sub">Подбери тариф под свои задачи</p>
+
+            <div class="pricing-grid">
+                <!-- Базовый -->
+                <div class="pricing-card">
+                    <p class="plan-name">Базовый</p>
+                    <div class="price">0 <span>₽</span></div>
+                    <p style="color:#64748B; font-size:14px;">/ месяц</p>
+                    <ul>
+                        <li>50 запросов в месяц</li>
+                        <li>Доступ к базовой модели</li>
+                        <li>Поддержка 24/7</li>
+                    </ul>
+                    <!-- ===== КНОПКА 2: Telegram ===== -->
+                    <a href="https://t.me/Jexonflier" target="_blank" class="cta-btn outline">Выбрать</a>
+                </div>
+
+                <!-- Про (популярный) -->
+                <div class="pricing-card popular">
+                    <p class="plan-name">Про</p>
+                    <div class="price">999 <span>₽</span></div>
+                    <p style="color:#64748B; font-size:14px;">/ месяц</p>
+                    <ul>
+                        <li>♾️ Неограниченные запросы</li>
+                        <li>🚀 Приоритетная обработка</li>
+                        <li>🔗 Все интеграции</li>
+                    </ul>
+                    <!-- ===== КНОПКА 3: Telegram ===== -->
+                    <a href="https://t.me/Jexonflier" target="_blank" class="cta-btn">Выбрать</a>
+                </div>
+
+                <!-- Бизнес -->
+                <div class="pricing-card">
+                    <p class="plan-name">Бизнес</p>
+                    <div class="price">Индив.</div>
+                    <p style="color:#64748B; font-size:14px;">под запрос</p>
+                    <ul>
+                        <li>🔑 API доступ</li>
+                        <li>🖥️ Выделенный сервер</li>
+                        <li>📈 SLA 99.9%</li>
+                    </ul>
+                    <!-- ===== КНОПКА 4: Telegram ===== -->
+                    <a href="https://t.me/Jexonflier" target="_blank" class="cta-btn outline">Связаться</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FINAL CTA ===== -->
+    <section class="final-cta">
+        <div class="container">
+            <h2>Готов начать <span class="gradient-text">прямо сейчас</span>?</h2>
+            <p>Присоединяйся к тысячам пользователей, которые уже ускорили свою работу</p>
+            <!-- ===== КНОПКА 5: Telegram ===== -->
+            <a href="https://t.me/Jexonflier" target="_blank" class="cta-btn">🔥 Начать работать с MindFlow</a>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="container">
+            <p>© 2026 MindFlow. Сделано для портфолио.</p>
+        </div>
+    </footer>
+
+    <!-- ===== SCRIPT ===== -->
+    <script>
+        // ===== ПЕЧАТАЮЩИЙСЯ ТЕКСТ =====
+        const words = [
+            'Напиши мне план для...',
+            'Сгенерируй идею для...',
+            'Напиши пост о...',
+            'Перепиши этот текст...',
+            'Сделай анализ данных...'
+        ];
+
+        let wordIndex = 0;
+        let charIndex = 0;
+        const typingEl = document.querySelector('.typing-text');
+
+        function typeEffect() {
+            if (charIndex < words[wordIndex].length) {
+                typingEl.textContent += words[wordIndex].charAt(charIndex);
+                charIndex++;
+                setTimeout(typeEffect, 70);
+            } else {
+                setTimeout(eraseEffect, 2500);
+            }
+        }
+
+        function eraseEffect() {
+            if (charIndex > 0) {
+                typingEl.textContent = words[wordIndex].substring(0, charIndex - 1);
+                charIndex--;
+                setTimeout(eraseEffect, 30);
+            } else {
+                wordIndex = (wordIndex + 1) % words.length;
+                setTimeout(typeEffect, 400);
+            }
+        }
+
+        typeEffect();
+
+        // ===== СЧЁТЧИК КЛИКОВ ПО КНОПКАМ (для портфолио) =====
+        let totalClicks = 0;
+        const allButtons = document.querySelectorAll('.cta-btn');
+
+        allButtons.forEach((btn, index) => {
+            btn.addEventListener('click', function(e) {
+                totalClicks++;
+                console.log(`🔘 Кнопка ${index + 1} нажата! Всего кликов: ${totalClicks}`);
+                // Можно раскомментировать для отладки:
+                // alert(`Спасибо! Ты переходишь в Telegram. Всего кликов: ${totalClicks}`);
+            });
+        });
+
+        console.log('🚀 MindFlow landing loaded! Все кнопки ведут в Telegram: t.me/Jexonflier');
+    </script>
+
+</body>
+</html>
